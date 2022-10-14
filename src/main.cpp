@@ -48,39 +48,31 @@ HuffNode *make_tree(std::vector<HuffNode *> &initNodes)
     // create a temp node with the first two nodes in the vector
     HuffNode *temp = combine_nodes(initNodes[0], initNodes[1]);
     // erase the first two nodes in the vector
-    std::cout << temp->get_probability() << " ";
     initNodes.erase(initNodes.begin());
     initNodes.erase(initNodes.begin());
-    std::cout << temp->get_probability() << "\n";
     // place the temp node back into the vector
     std::vector<HuffNode *> temp_vector = place_sorted(initNodes, temp);
     initNodes = temp_vector;
-    for (int i = 0; i < initNodes.size(); i++)
-    {
-      std::cout << initNodes[i]->get_probability() << " ";
-    }
-    std::cout << "\n";
   }
-  return combine_nodes(initNodes[0], initNodes[1]);
+  return initNodes[0];
 }
 
-void encode(std::vector<std::pair<char, std::string>> &codes, HuffNode *head, std::string code = "")
+void create_codes(std::vector<std::pair<char, std::string>> &codes, HuffNode *head, std::string code = "")
 {
   if (head->get_symbol() == '\0')
   {
     if (head->get_right() != nullptr)
     {
       code += "1";
-      encode(codes, head->get_right(), code);
+      create_codes(codes, head->get_right(), code);
+      code.pop_back();
     }
     if (head->get_left() != nullptr)
     {
       code += "0";
-      encode(codes, head->get_left(), code);
-    }
-    if (head->get_right() == nullptr && head->get_left() == nullptr)
-    {
-      return;
+      create_codes(codes, head->get_left(), code);
+      code.pop_back();
+
     }
   }
   else
@@ -89,44 +81,6 @@ void encode(std::vector<std::pair<char, std::string>> &codes, HuffNode *head, st
   }
 }
 
-void print2DUtil(HuffNode *root, int space)
-{
-  // Base case
-  if (root == NULL)
-    return;
-
-  // Increase distance between levels
-  space += 10;
-
-  // Process right child first
-  print2DUtil(root->get_right(), space);
-
-  // Print current node after space
-  // count
-  std::cout << std::endl;
-  for (int i = 10; i < space; i++)
-    std::cout << " ";
-  char c;
-  if (root->get_symbol() == '\0')
-  {
-    c = '0';
-  }
-  else
-  {
-    c = root->get_symbol();
-  }
-  std::cout << c << "\n";
-
-  // Process left child
-  print2DUtil(root->get_left(), space);
-}
-
-// Wrapper over print2DUtil()
-void print2D(HuffNode *root)
-{
-  // Pass initial space count as 0
-  print2DUtil(root, 0);
-}
 
 int main()
 {
@@ -145,9 +99,8 @@ int main()
   vec = place_sorted(vec, e);
   vec = place_sorted(vec, f);
   HuffNode *tree = make_tree(vec);
-  print2D(tree);
   std::vector<std::pair<char, std::string>> codes;
-  encode(codes, tree);
+  create_codes(codes, tree);
   for (int i = 0; i < codes.size(); i++)
   {
     std::cout << codes[i].first << " " << codes[i].second << "\n";

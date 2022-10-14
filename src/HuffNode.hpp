@@ -1,12 +1,15 @@
 #pragma once
-
+#include <string>
+ 
 class HuffNode {
 protected:
   float p;
   HuffNode* lChild;
   HuffNode* rChild;
   char symbol;
+  
 public:
+  std::string child_symbols;
   HuffNode(float prob, HuffNode* leftChild, HuffNode* rightChild, char s = '\0');
 
 public:
