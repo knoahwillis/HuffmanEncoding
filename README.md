@@ -2,5 +2,5 @@
 Huffman Encoding in C++
 
 Use:
-'make'
-'./Huff'
+```make```
+```./Huff```
