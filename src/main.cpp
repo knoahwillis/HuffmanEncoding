@@ -1,27 +1,20 @@
 #include "HuffNode.hpp"
 #include "Functions.hpp"
-int main()
-{
-  HuffNode *a = new HuffNode(0.35f, nullptr, nullptr, 'a');
-  HuffNode *b = new HuffNode(0.10f, nullptr, nullptr, 'b');
-  HuffNode *c = new HuffNode(0.19f, nullptr, nullptr, 'c');
-  HuffNode *d = new HuffNode(0.25f, nullptr, nullptr, 'd');
-  HuffNode *e = new HuffNode(0.06f, nullptr, nullptr, '1');
-  HuffNode *f = new HuffNode(0.05f, nullptr, nullptr, '2');
-  std::vector<HuffNode *> vec;
 
-  vec = place_sorted(vec, a);
-  vec = place_sorted(vec, b);
-  vec = place_sorted(vec, c);
-  vec = place_sorted(vec, d);
-  vec = place_sorted(vec, e);
-  vec = place_sorted(vec, f);
-  HuffNode *tree = make_tree(vec);
-  std::vector<std::pair<char, std::string>> codes;
-  create_codes(codes, tree);
-  for (int i = 0; i < codes.size(); i++)
-  {
-    std::cout << codes[i].first << " " << codes[i].second << "\n";
+int main() {
+  std::vector<HuffNode *> vec;
+  int total = 0;
+  float sum = 0;
+  std::unordered_map<char, int> probs = get_probabilities("original.txt", total);
+  for(auto i : probs) {
+    vec = place_sorted(vec, (new HuffNode((static_cast<float>(i.second) / total), nullptr, nullptr, i.first)));
+    sum += (static_cast<float>(i.second) / total);
   }
+  HuffNode *tree = make_tree(vec);
+  std::unordered_map<char, std::string> codes;
+  create_codes(codes, tree);
+  std::unordered_map<std::string, char> decode = reverse_map(codes);
+  text_to_codes("original.txt", "outputEncoded.txt", codes);
+  codes_to_text("outputEncoded.txt", "outputDecoded.txt", decode);
   return 0;
 }

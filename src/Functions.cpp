@@ -53,7 +53,7 @@ HuffNode *make_tree(std::vector<HuffNode *> &initNodes)
   return initNodes[0];
 }
 
-void create_codes(std::vector<std::pair<char, std::string>> &codes, HuffNode *head, std::string code)
+void create_codes(std::unordered_map<char, std::string> &codes, HuffNode *head, std::string code)
 {
   if (head->get_symbol() == '\0')
   {
@@ -72,6 +72,72 @@ void create_codes(std::vector<std::pair<char, std::string>> &codes, HuffNode *he
   }
   else
   {
-    codes.push_back(std::make_pair(head->get_symbol(), code));
+    codes.insert({head->get_symbol(), code});
   }
+}
+
+std::unordered_map<std::string, char> reverse_map(std::unordered_map<char, std::string> map)
+{
+  std::unordered_map<std::string, char> ret;
+  for (const std::pair<const char, std::string> &n : map)
+  {
+    ret.insert({n.second, n.first});
+  }
+  return ret;
+}
+
+std::unordered_map<char, int> get_probabilities(std::string filename, int &total)
+{
+  std::unordered_map<char, int> ret;
+  std::fstream s(filename, s.in);
+  char c;
+  while (s.good())
+  {
+    total++;
+    s.get(c);
+    if (ret.count(c) >= 1)
+    {
+      ret[c]++;
+    }
+    else
+    {
+      ret.insert(std::make_pair(c, 1));
+    }
+  }
+  s.close();
+  return ret;
+}
+
+void text_to_codes(std::string ifile, std::string ofile, std::unordered_map<char, std::string> codes)
+{
+  std::fstream sin(ifile, sin.in);
+  std::fstream sout(ofile, sout.out);
+  char c;
+  while (sin.good())
+  {
+    sin.get(c);
+    sout << codes[c];
+  }
+  sin.close();
+  sout.close();
+}
+
+void codes_to_text(std::string ifile, std::string ofile, std::unordered_map<std::string, char> codes)
+{
+  std::fstream sin(ifile, sin.in);
+  std::fstream sout(ofile, sout.out);
+  std::string s = "";
+  char c;
+  while (sin.good())
+  {
+    sin.get(c);
+    s += c;
+    if (codes.count(s) != 0)
+    {
+      sout << codes[s];
+      s = "";
+    }
+  }
+  sin.close();
+  sout.close();
 }
